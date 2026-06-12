@@ -1,0 +1,207 @@
+const User = require('../models/User');
+const Swipe = require('../models/Swipe');
+const Match = require('../models/Match');
+const Message = require('../models/Message');
+
+const mockUsers = [
+  {
+    name: 'Ananya Sharma',
+    email: 'ananya@example.com',
+    password: 'password123',
+    dateOfBirth: new Date('2000-05-15'),
+    gender: 'female',
+    bio: 'Software engineer at a tech startup. Love hiking, cooking, and standard filter coffee. Looking for someone family-oriented and progressive. 🌸',
+    photos: [],
+    religion: 'Hindu',
+    caste: 'Brahmin',
+    motherTongue: 'Hindi',
+    maritalStatus: 'never_married',
+    height: 165,
+    weight: 55,
+    education: "Bachelor's",
+    occupation: 'Engineer',
+    annualIncome: '10-20 LPA',
+    familyType: 'nuclear',
+    diet: 'vegetarian',
+    hobbies: ['Cooking', 'Travelling', 'Yoga'],
+    location: { type: 'Point', coordinates: [72.8777, 19.0760] }, // Mumbai
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    profileComplete: true,
+    profileCompletionStep: 5,
+  },
+  {
+    name: 'Priya Patel',
+    email: 'priya@example.com',
+    password: 'password123',
+    dateOfBirth: new Date('1998-08-22'),
+    gender: 'female',
+    bio: 'Pediatrician by profession, dancer by heart. Love exploring new cafes and reading historical fiction. Let\'s grab a cup of chai! ☕💃',
+    photos: [],
+    religion: 'Hindu',
+    caste: 'Patel',
+    motherTongue: 'Gujarati',
+    maritalStatus: 'never_married',
+    height: 160,
+    weight: 52,
+    education: 'Professional Degree (MD/JD)',
+    occupation: 'Doctor',
+    annualIncome: '20-40 LPA',
+    familyType: 'joint',
+    diet: 'vegetarian',
+    hobbies: ['Dancing', 'Reading', 'Travelling'],
+    location: { type: 'Point', coordinates: [72.8800, 19.0800] }, // Near Mumbai
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    profileComplete: true,
+    profileCompletionStep: 5,
+  },
+  {
+    name: 'Amina Khan',
+    email: 'amina@example.com',
+    password: 'password123',
+    dateOfBirth: new Date('1999-11-02'),
+    gender: 'female',
+    bio: 'Interior designer. Creative, passionate about sustainable living, and an amateur photographer. Looking for an honest and kind soul. ✨',
+    photos: [],
+    religion: 'Muslim',
+    caste: 'Pathan',
+    motherTongue: 'Urdu',
+    maritalStatus: 'never_married',
+    height: 162,
+    weight: 50,
+    education: "Bachelor's",
+    occupation: 'Artist/Creative',
+    annualIncome: '6-10 LPA',
+    familyType: 'nuclear',
+    diet: 'non_vegetarian',
+    hobbies: ['Photography', 'Art', 'Music'],
+    location: { type: 'Point', coordinates: [72.8500, 19.0500] }, // Bandra, Mumbai
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    profileComplete: true,
+    profileCompletionStep: 5,
+  },
+  {
+    name: 'Rahul Verma',
+    email: 'rahul@example.com',
+    password: 'password123',
+    dateOfBirth: new Date('1996-03-10'),
+    gender: 'male',
+    bio: 'Finance analyst. Weekend trekker, fitness enthusiast, and absolute foodie. Looking for a partner to share life\'s simple adventures with.',
+    photos: [],
+    religion: 'Hindu',
+    caste: 'Kshatriya',
+    motherTongue: 'Hindi',
+    maritalStatus: 'never_married',
+    height: 178,
+    weight: 74,
+    education: "Master's",
+    occupation: 'Finance',
+    annualIncome: '20-40 LPA',
+    familyType: 'nuclear',
+    diet: 'non_vegetarian',
+    hobbies: ['Fitness', 'Travelling', 'Movies'],
+    location: { type: 'Point', coordinates: [72.8777, 19.0760] }, // Mumbai
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    profileComplete: true,
+    profileCompletionStep: 5,
+  },
+  {
+    name: 'Kabir Singh',
+    email: 'kabir@example.com',
+    password: 'password123',
+    dateOfBirth: new Date('1995-12-18'),
+    gender: 'male',
+    bio: 'IT consultant, gamer, and puppy dad. I enjoy playing guitar, outdoor runs, and deep conversations. Let\'s connect if you enjoy retro music! 🎸',
+    photos: [],
+    religion: 'Sikh',
+    caste: 'Jat',
+    motherTongue: 'Punjabi',
+    maritalStatus: 'never_married',
+    height: 182,
+    weight: 80,
+    education: "Bachelor's",
+    occupation: 'IT/Tech',
+    annualIncome: '10-20 LPA',
+    familyType: 'nuclear',
+    diet: 'non_vegetarian',
+    hobbies: ['Gaming', 'Music', 'Fitness'],
+    location: { type: 'Point', coordinates: [72.9000, 19.1000] }, // Powai, Mumbai
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    profileComplete: true,
+    profileCompletionStep: 5,
+  },
+  {
+    name: 'Deepika Padukone',
+    email: 'deepika@example.com',
+    password: 'password123',
+    dateOfBirth: new Date('1997-01-05'),
+    gender: 'female',
+    bio: 'Marketing Lead. Yoga practitioner, badminton player, and dog lover. Believe in living life to the fullest with positive vibes. 🧘‍♀️🐾',
+    photos: [],
+    religion: 'Hindu',
+    caste: 'Saraswat',
+    motherTongue: 'Kannada',
+    maritalStatus: 'never_married',
+    height: 173,
+    weight: 58,
+    education: "Bachelor's",
+    occupation: 'Sales/Marketing',
+    annualIncome: '20-40 LPA',
+    familyType: 'nuclear',
+    diet: 'vegetarian',
+    hobbies: ['Yoga', 'Travelling', 'Fitness'],
+    location: { type: 'Point', coordinates: [77.5946, 12.9716] }, // Bangalore
+    city: 'Bangalore',
+    state: 'Karnataka',
+    profileComplete: true,
+    profileCompletionStep: 5,
+  },
+  {
+    name: 'Arjun Mehta',
+    email: 'arjun@example.com',
+    password: 'password123',
+    dateOfBirth: new Date('1994-06-25'),
+    gender: 'male',
+    bio: 'Entrepreneur running a sustainable design studio. Travel junkie and experimental cook. Looking for a mature and passionate partner.',
+    photos: [],
+    religion: 'Hindu',
+    caste: 'Shah',
+    motherTongue: 'Gujarati',
+    maritalStatus: 'never_married',
+    height: 175,
+    weight: 70,
+    education: "Master's",
+    occupation: 'Business Owner',
+    annualIncome: '40+ LPA',
+    familyType: 'nuclear',
+    diet: 'vegetarian',
+    hobbies: ['Cooking', 'Art', 'Travelling'],
+    location: { type: 'Point', coordinates: [77.6200, 12.9300] }, // Koramangala, Bangalore
+    city: 'Bangalore',
+    state: 'Karnataka',
+    profileComplete: true,
+    profileCompletionStep: 5,
+  }
+];
+
+const seedDB = async () => {
+  try {
+    const userCount = await User.countDocuments();
+    if (userCount > 0) {
+      console.log('ℹ️ Database already has users. Skipping seeding.');
+      return;
+    }
+
+    console.log('🌱 Seeding mock profiles into MongoDB...');
+    await User.create(mockUsers);
+    console.log(`✅ Successfully seeded ${mockUsers.length} mock matrimonial profiles!`);
+  } catch (error) {
+    console.error('❌ Seeding failed:', error);
+  }
+};
+
+module.exports = seedDB;
