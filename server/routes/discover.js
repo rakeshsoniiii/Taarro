@@ -1,14 +1,14 @@
 const express = require('express');
-const db = require('../config/db');
+const { db } = require('../config/dbAdapter');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
 // @route  GET /api/discover
 // @desc   Get profiles filtered by preferences
-router.get('/', protect, (req, res) => {
+router.get('/', protect, async (req, res) => {
   try {
-    const users = db.getDiscoverProfiles(req.user._id);
+    const users = await db.getDiscoverProfiles(req.user._id);
     res.json({ success: true, users });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -17,9 +17,9 @@ router.get('/', protect, (req, res) => {
 
 // @route  GET /api/discover/nearby-map
 // @desc   Get nearby users with fuzzy coordinates for map view
-router.get('/nearby-map', protect, (req, res) => {
+router.get('/nearby-map', protect, async (req, res) => {
   try {
-    const users = db.getNearbyMapUsers(req.user._id);
+    const users = await db.getNearbyMapUsers(req.user._id);
     res.json({ success: true, users });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import ThreeBackground from '../../components/ThreeBackground/ThreeBackground';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -17,12 +18,15 @@ export default function LandingPage() {
       position: 'relative',
       overflow: 'hidden',
     }}>
+      {/* Three.js Background */}
+      <ThreeBackground />
+
       {/* Glow orbs */}
       <div style={{ position: 'absolute', top: '10%', left: '20%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,62,108,0.12)', filter: 'blur(80px)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: '15%', right: '15%', width: 250, height: 250, borderRadius: '50%', background: 'rgba(139,92,246,0.12)', filter: 'blur(60px)', pointerEvents: 'none' }} />
 
-      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-        <div style={{ fontSize: 80, marginBottom: 16 }}>💕</div>
+      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} style={{ zIndex: 1 }}>
+        <img src="/Taarro logo.png" alt="Taarro" style={{ height: 100, marginBottom: 16 }} />
         <h1 style={{
           fontFamily: 'Outfit, sans-serif',
           fontSize: 'clamp(48px, 12vw, 80px)',
@@ -33,7 +37,7 @@ export default function LandingPage() {
           lineHeight: 1,
           marginBottom: 16,
         }}>
-          BuddyUps
+          Taarro
         </h1>
         <p style={{ fontSize: 20, color: 'rgba(255,255,255,0.6)', maxWidth: 400, margin: '0 auto 16px' }}>
           Find your perfect match — nearby, by heart, and for life.

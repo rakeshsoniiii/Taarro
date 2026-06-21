@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Heart, MessageCircle, MapPin, User, Flame } from 'lucide-react';
+import { Heart, MessageCircle, MapPin, User, Flame, BookOpen, Users } from 'lucide-react';
 
 const NavItem = ({ icon: Icon, label, path, current }) => {
   const navigate = useNavigate();
@@ -19,9 +19,9 @@ export default function BottomNav() {
   return (
     <nav className="bottom-nav">
       <NavItem icon={Flame} label="Discover" path="/discover" current={pathname} />
+      <NavItem icon={BookOpen} label="Stories" path="/stories" current={pathname} />
       <NavItem icon={Heart} label="Matches" path="/matches" current={pathname} />
-      <NavItem icon={MessageCircle} label="Chat" path="/chat" current={pathname} />
-      <NavItem icon={MapPin} label="Nearby" path="/nearby" current={pathname} />
+      <NavItem icon={Users} label="Communities" path="/communities" current={pathname} />
       <NavItem icon={User} label="Profile" path="/profile" current={pathname} />
     </nav>
   );

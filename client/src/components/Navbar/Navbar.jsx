@@ -15,8 +15,9 @@ export default function Navbar() {
 
   return (
     <header className="navbar">
-      <div className="navbar-logo" onClick={() => navigate('/discover')} style={{ cursor: 'pointer' }}>
-        💕 BuddyUps
+      <div className="navbar-logo" onClick={() => navigate('/discover')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <img src="/Taarro logo.png" alt="Taarro" style={{ height: 32 }} />
+        Taarro
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {user && (

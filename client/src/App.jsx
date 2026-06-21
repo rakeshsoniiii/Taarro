@@ -12,6 +12,8 @@ import Matches from './pages/Matches/Matches';
 import Chat from './pages/Chat/Chat';
 import Profile from './pages/Profile/Profile';
 import NearbyMap from './pages/NearbyMap/NearbyMap';
+import Stories from './pages/Stories/Stories';
+import Communities from './pages/Communities/Communities';
 import './index.css';
 
 const PrivateRoute = ({ children }) => {
@@ -62,8 +64,10 @@ function App() {
               <Route path="/auth" element={<PublicRoute><AuthPage /></PublicRoute>} />
               <Route path="/setup" element={<PrivateRoute><SetupProfile /></PrivateRoute>} />
               <Route path="/discover" element={<PrivateRoute><Discover /></PrivateRoute>} />
+              <Route path="/stories" element={<PrivateRoute><Stories /></PrivateRoute>} />
               <Route path="/matches" element={<PrivateRoute><Matches /></PrivateRoute>} />
               <Route path="/chat/:matchId?" element={<PrivateRoute><Chat /></PrivateRoute>} />
+              <Route path="/communities" element={<PrivateRoute><Communities /></PrivateRoute>} />
               <Route path="/nearby" element={<PrivateRoute><NearbyMap /></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="*" element={<Navigate to="/" replace />} />

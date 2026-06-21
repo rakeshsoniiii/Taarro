@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const db = require('../config/db');
+const { db } = require('../config/dbAdapter');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
@@ -37,7 +37,7 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide all required fields' });
     }
 
-    const existingUser = db.findUserByEmail(email);
+    const existingUser = await db.findUserByEmail(email);
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Email already registered' });
     }
@@ -58,7 +58,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide email and password' });
     }
 
-    const user = db.findUserByEmail(email);
+    const user = await db.findUserByEmail(email);
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
@@ -68,7 +68,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    db.updateUser(user._id, { lastSeen: new Date() });
+    await db.updateUser(user._id, { lastSeen: new Date() });
 
     const { password: pw, ...safeUser } = user;
     sendTokenResponse(safeUser, 200, res);
@@ -85,9 +85,9 @@ router.post('/logout', protect, (req, res) => {
 });
 
 // @route GET /api/auth/me
-router.get('/me', protect, (req, res) => {
+router.get('/me', protect, async (req, res) => {
   try {
-    const user = db.findUserById(req.user._id);
+    const user = await db.findUserById(req.user._id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     const { password, ...safeUser } = user;
     res.json({ success: true, user: safeUser });

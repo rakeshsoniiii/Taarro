@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const db = require('../config/db');
+const { db } = require('../config/dbAdapter');
 
 const protect = async (req, res, next) => {
   try {
@@ -19,13 +19,12 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = db.findUserById(decoded.id);
+    const user = await db.findUserById(decoded.id);
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'User not found' });
     }
 
-    // Strip password
     const { password, ...safeUser } = user;
     req.user = safeUser;
 

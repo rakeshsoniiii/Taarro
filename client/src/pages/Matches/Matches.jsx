@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, Heart } from 'lucide-react';
+import { MessageCircle, Heart, Calendar, Sparkles, Users } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -11,7 +11,21 @@ const API_BASE = 'http://localhost:5000';
 export default function Matches() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loveScores, setLoveScores] = useState({});
   const navigate = useNavigate();
+
+  const getLoveScore = async (match) => {
+    if (loveScores[match._id]) return;
+    try {
+      const { data } = await api.post('/features/ai/love-score', {
+        user1Id: match._id,
+        user2Id: match.matchedUser._id
+      });
+      setLoveScores(prev => ({ ...prev, [match._id]: data }));
+    } catch (err) {
+      console.error('Failed to get love score', err);
+    }
+  };
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -59,7 +73,6 @@ export default function Matches() {
                   transition={{ delay: i * 0.05 }}
                   className="glass-card"
                   style={{ overflow: 'hidden', cursor: 'pointer', position: 'relative' }}
-                  onClick={() => navigate(`/chat/${match._id}`)}
                   whileHover={{ y: -4 }}
                 >
                   <div style={{ position: 'relative', aspectRatio: '3/4' }}>
@@ -75,9 +88,65 @@ export default function Matches() {
                       </div>
                     </div>
                   </div>
-                  {match.lastMessage && (
-                    <div style={{ padding: '10px 12px', borderTop: '1px solid var(--border)', fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {match.lastMessage.text}
+                  
+                  {/* Match Actions */}
+                  <div style={{ padding: '10px 12px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button 
+                      className="btn btn-secondary btn-sm"
+                      style={{ flex: 1, minWidth: 'auto', fontSize: '11px' }}
+                      onClick={(e) => { e.stopPropagation(); getLoveScore(match); }}
+                    >
+                      <Sparkles size={12} /> Love Score
+                    </button>
+                    <button 
+                      className="btn btn-secondary btn-sm"
+                      style={{ flex: 1, minWidth: 'auto', fontSize: '11px' }}
+                      onClick={(e) => { e.stopPropagation(); toast.success('Anniversary feature coming soon!'); }}
+                    >
+                      <Calendar size={12} /> Anniversary
+                    </button>
+                    <button 
+                      className="btn btn-secondary btn-sm"
+                      style={{ flex: 1, minWidth: 'auto', fontSize: '11px' }}
+                      onClick={(e) => { e.stopPropagation(); toast.success('Couple Dashboard coming soon!'); }}
+                    >
+                      <Users size={12} /> Dashboard
+                    </button>
+                  </div>
+
+                  {/* Love Score Display */}
+                  {loveScores[match._id] && (
+                    <div style={{ 
+                      padding: '12px', 
+                      background: 'var(--bg-elevated)', 
+                      borderTop: '1px solid var(--border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '12px', fontWeight: '700' }}>{loveScores[match._id].loveType}</span>
+                        <span style={{ fontSize: '18px', fontWeight: '800', color: 'var(--primary)' }}>
+                          {loveScores[match._id].romanticPercentage}%
+                        </span>
+                      </div>
+                      <div style={{ 
+                        height: '8px', 
+                        background: 'var(--border)', 
+                        borderRadius: '999px',
+                        overflow: 'hidden'
+                      }}>
+                        <motion.div 
+                          style={{ 
+                            height: '100%', 
+                            background: 'linear-gradient(90deg, #ff3e6c, #8b5cf6)',
+                            width: `${loveScores[match._id].romanticPercentage}%`
+                          }} 
+                          initial={{ width: 0 }} 
+                          animate={{ width: `${loveScores[match._id].romanticPercentage}%` }}
+                          transition={{ duration: 1 }}
+                        />
+                      </div>
                     </div>
                   )}
                 </motion.div>

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
-import { Camera, Edit3, X, LogOut, Settings, MapPin, GraduationCap, Briefcase, Heart } from 'lucide-react';
+import { Camera, Edit3, X, LogOut, Settings, MapPin, GraduationCap, Briefcase, Heart, Sparkles, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const API_BASE = 'http://localhost:5000';
@@ -29,6 +29,12 @@ export default function Profile() {
   const [form, setForm] = useState({ bio: user?.bio || '', city: user?.city || '' });
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showAIBio, setShowAIBio] = useState(false);
+  const [aiBioForm, setAiBioForm] = useState({ interests: '', profession: user?.occupation || '' });
+  const [aiBioResult, setAiBioResult] = useState(null);
+  const [showPhotoRating, setShowPhotoRating] = useState(false);
+  const [photoRatings, setPhotoRatings] = useState([]);
+  const [generating, setGenerating] = useState(false);
   const fileRef = useRef();
   const navigate = useNavigate();
 
@@ -86,6 +92,31 @@ export default function Profile() {
     navigate('/');
   };
 
+  const generateBio = async () => {
+    setGenerating(true);
+    try {
+      const { data } = await api.post('/features/ai/generate-bio', {
+        interests: aiBioForm.interests.split(',').map(s => s.trim()).filter(Boolean),
+        profession: aiBioForm.profession
+      });
+      setAiBioResult(data);
+    } catch (err) {
+      toast.error('Failed to generate bio');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const ratePhotos = async () => {
+    try {
+      const { data } = await api.post('/features/ai/rate-photos', { photos: user.photos });
+      setPhotoRatings(data.ratings);
+      setShowPhotoRating(true);
+    } catch (err) {
+      toast.error('Failed to rate photos');
+    }
+  };
+
   // Completion percentage
   const fields = [user?.bio, user?.photos?.[0], user?.religion, user?.education, user?.occupation, user?.city, user?.location?.coordinates?.[0] !== 0];
   const completion = Math.round((fields.filter(Boolean).length / fields.length) * 100);
@@ -136,7 +167,12 @@ export default function Profile() {
           {/* Photo Grid */}
           {user?.photos?.length > 0 && (
             <div style={{ marginBottom: 24 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>My Photos</h3>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>My Photos</h3>
+                <button className="btn btn-primary btn-sm" onClick={ratePhotos}>
+                  <Star size={14} /> Rate Photos
+                </button>
+              </div>
               <div className="photo-grid">
                 {user.photos.map((p, i) => (
                   <div key={i} className="photo-slot" style={{ cursor: 'default' }}>
@@ -145,17 +181,123 @@ export default function Profile() {
                   </div>
                 ))}
               </div>
+
+              {showPhotoRating && (
+                <div style={{ 
+                  marginTop: '16px', 
+                  padding: '16px', 
+                  background: 'var(--bg-elevated)', 
+                  borderRadius: '12px',
+                  border: '1px solid var(--border)'
+                }}>
+                  <h4 style={{ marginBottom: '12px', fontSize: '14px', fontWeight: '700' }}>Photo Ratings</h4>
+                  {photoRatings.map((rating, i) => (
+                    <div key={i} style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '12px', 
+                      padding: '8px 0',
+                      borderBottom: i < photoRatings.length - 1 ? '1px solid var(--border)' : 'none'
+                    }}>
+                      <img 
+                        src={`${API_BASE}${rating.url}`} 
+                        alt="photo" 
+                        style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} 
+                      />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: '600', color: 'var(--primary)' }}>
+                            {'⭐'.repeat(rating.rating)}{'☆'.repeat(5 - rating.rating)}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{rating.suggestion}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           {/* Bio Section */}
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 700 }}>About Me</h3>
-              <button className="btn btn-secondary btn-sm" onClick={() => editing ? handleSave() : setEditing(true)}>
-                {saving ? '...' : editing ? '✓ Save' : <><Edit3 size={14} /> Edit</>}
-              </button>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>About Me</h3>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button className="btn btn-secondary btn-sm" onClick={() => setShowAIBio(!showAIBio)}>
+                  <Sparkles size={14} /> AI Bio
+                </button>
+                <button className="btn btn-secondary btn-sm" onClick={() => editing ? handleSave() : setEditing(true)}>
+                  {saving ? '...' : editing ? '✓ Save' : <><Edit3 size={14} /> Edit</>}
+                </button>
+              </div>
             </div>
+            
+            {showAIBio && (
+              <div style={{ 
+                marginBottom: '12px', 
+                padding: '16px', 
+                background: 'var(--bg-elevated)', 
+                borderRadius: '12px',
+                border: '1px solid var(--border)'
+              }}>
+                <h4 style={{ marginBottom: '12px', fontSize: '14px', fontWeight: '700' }}>Generate Bio</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '12px' }}>
+                  <input 
+                    type="text" 
+                    className="input" 
+                    placeholder="Your profession (e.g., Software Engineer)"
+                    value={aiBioForm.profession}
+                    onChange={(e) => setAiBioForm(f => ({ ...f, profession: e.target.value }))}
+                  />
+                  <input 
+                    type="text" 
+                    className="input" 
+                    placeholder="Interests (comma separated, e.g., Hiking, Reading, Cooking)"
+                    value={aiBioForm.interests}
+                    onChange={(e) => setAiBioForm(f => ({ ...f, interests: e.target.value }))}
+                  />
+                  <button className="btn btn-primary" onClick={generateBio} disabled={generating}>
+                    {generating ? 'Generating...' : 'Generate Bio'}
+                  </button>
+                </div>
+                
+                {aiBioResult && (
+                  <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                    <div style={{ marginBottom: '12px' }}>
+                      <h5 style={{ fontSize: '13px', fontWeight: '700', marginBottom: '8px' }}>Generated Bio</h5>
+                      <p style={{ fontSize: '14px', lineHeight: '1.6' }}>{aiBioResult.bio}</p>
+                      <button 
+                        className="btn btn-primary btn-sm" 
+                        style={{ marginTop: '8px' }} 
+                        onClick={() => { setForm(f => ({ ...f, bio: aiBioResult.bio })); setShowAIBio(false); setEditing(true); }}
+                      >
+                        Use This Bio
+                      </button>
+                    </div>
+                    
+                    {aiBioResult.prompts && (
+                      <div style={{ marginBottom: '12px' }}>
+                        <h5 style={{ fontSize: '13px', fontWeight: '700', marginBottom: '8px' }}>Conversation Prompts</h5>
+                        <ul style={{ fontSize: '14px', paddingLeft: '16px', margin: 0 }}>
+                          {aiBioResult.prompts.map((p, i) => <li key={i}>{p}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {aiBioResult.introductions && (
+                      <div>
+                        <h5 style={{ fontSize: '13px', fontWeight: '700', marginBottom: '8px' }}>Opening Lines</h5>
+                        <ul style={{ fontSize: '14px', paddingLeft: '16px', margin: 0 }}>
+                          {aiBioResult.introductions.map((p, i) => <li key={i}>{p}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+            
             {editing ? (
               <textarea
                 className="input"

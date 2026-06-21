@@ -1,7 +1,7 @@
 {
-  "name": "buddyups",
+  "name": "taarro",
   "version": "1.0.0",
-  "description": "BuddyUps - Full Stack Matrimonial & Dating App",
+  "description": "Taarro - Full Stack Matrimonial & Dating App",
   "scripts": {
     "server": "cd server && node server.js",
     "client": "cd client && npm run dev",
@@ -10,5 +10,5 @@
     "start:mongo": "\"C:\\Program Files\\MongoDB\\Server\\7.0\\bin\\mongod.exe\" --dbpath C:\\data\\db"
   },
   "keywords": ["dating", "matrimonial", "react", "nodejs", "mongodb"],
-  "author": "BuddyUps"
+  "author": "Taarro"
 }

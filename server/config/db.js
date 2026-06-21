@@ -245,12 +245,24 @@ const seedUsers = [
   },
 ];
 
+// Seed communities
+const seedCommunities = [
+  { _id: 'comm-1', name: 'Engineers', description: 'For tech enthusiasts and engineers', icon: '👨‍💻', members: [] },
+  { _id: 'comm-2', name: 'Doctors', description: 'For medical professionals', icon: '👨‍⚕️', members: [] },
+  { _id: 'comm-3', name: 'Entrepreneurs', description: 'For business owners and startup founders', icon: '🚀', members: [] },
+  { _id: 'comm-4', name: 'Gamers', description: 'For video game lovers', icon: '🎮', members: [] },
+  { _id: 'comm-5', name: 'Anime', description: 'For anime and manga fans', icon: '🌸', members: [] },
+  { _id: 'comm-6', name: 'Fitness', description: 'For fitness enthusiasts', icon: '💪', members: [] }
+];
+
 // ── In-Memory Collections ─────────────────────────────────────────────────────
 const db = {
   users: [...seedUsers],
   swipes: [],
   matches: [],
   messages: [],
+  stories: [],
+  communities: [...seedCommunities]
 };
 
 // ── Helper: get virtual age ───────────────────────────────────────────────────
@@ -470,6 +482,44 @@ db.markMessagesRead = (matchId, senderId) => {
   db.messages.forEach(m => {
     if (m.match === matchId && m.sender !== senderId) m.read = true;
   });
+};
+
+// ── Stories ──────────────────────────────────────────────────────────────────
+db.createStory = (userId, mediaUrl, mediaType, caption) => {
+  const story = {
+    _id: uuidv4(),
+    user: userId,
+    mediaUrl,
+    mediaType: mediaType || 'image',
+    caption,
+    createdAt: new Date()
+  };
+  db.stories.push(story);
+  return story;
+};
+
+db.getStories = (userId) => {
+  // Get stories from all users except the current user (or include? Let's include all)
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000;
+  return db.stories.filter(s => (now - new Date(s.createdAt).getTime()) < oneDay);
+};
+
+// ── Communities ─────────────────────────────────────────────────────────────
+db.getCommunities = () => db.communities;
+db.joinCommunity = (communityId, userId) => {
+  const community = db.communities.find(c => c._id === communityId);
+  if (community && !community.members.includes(userId)) {
+    community.members.push(userId);
+  }
+  return community;
+};
+db.leaveCommunity = (communityId, userId) => {
+  const community = db.communities.find(c => c._id === communityId);
+  if (community) {
+    community.members = community.members.filter(id => id !== userId);
+  }
+  return community;
 };
 
 module.exports = db;

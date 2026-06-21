@@ -1,15 +1,15 @@
-const db = require('../config/db');
 const jwt = require('jsonwebtoken');
+const { db, setUseMongo } = require('../config/dbAdapter');
 
 const socketHandler = (io) => {
   // Middleware: authenticate socket connections
-  io.use((socket, next) => {
+  io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth?.token || socket.handshake.query?.token;
       if (!token) return next(new Error('Authentication error'));
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = db.findUserById(decoded.id);
+      const user = await db.findUserById(decoded.id);
       if (!user) return next(new Error('User not found'));
 
       const { password, ...safeUser } = user;
@@ -27,12 +27,13 @@ const socketHandler = (io) => {
     socket.join(socket.user._id.toString());
 
     // Update last seen
-    db.updateUser(socket.user._id, { lastSeen: new Date() });
+    db.updateUser(socket.user._id, { lastSeen: new Date() }).catch(console.error);
 
     // ── Join a match/chat room ──────────────────────────
-    socket.on('join_match', ({ matchId }) => {
+    socket.on('join_match', async ({ matchId }) => {
       try {
-        if (db.isMatchParticipant(matchId, socket.user._id)) {
+        const isParticipant = await db.isMatchParticipant(matchId, socket.user._id);
+        if (isParticipant) {
           socket.join(`match_${matchId}`);
           console.log(`✅ ${socket.user.name} joined room match_${matchId}`);
         }
@@ -47,13 +48,14 @@ const socketHandler = (io) => {
     });
 
     // ── Send a message ─────────────────────────────────
-    socket.on('send_message', ({ matchId, text }) => {
+    socket.on('send_message', async ({ matchId, text }) => {
       try {
         if (!text || !text.trim()) return;
 
-        if (!db.isMatchParticipant(matchId, socket.user._id)) return;
+        const isParticipant = await db.isMatchParticipant(matchId, socket.user._id);
+        if (!isParticipant) return;
 
-        const message = db.createMessage(matchId, socket.user._id, text.trim());
+        const message = await db.createMessage(matchId, socket.user._id, text.trim());
 
         // Broadcast to match room
         io.to(`match_${matchId}`).emit('receive_message', {
@@ -81,7 +83,7 @@ const socketHandler = (io) => {
     // ── Disconnect ─────────────────────────────────────
     socket.on('disconnect', () => {
       console.log(`🔌 Socket disconnected: ${socket.user.name}`);
-      db.updateUser(socket.user._id, { lastSeen: new Date() });
+      db.updateUser(socket.user._id, { lastSeen: new Date() }).catch(console.error);
     });
   });
 };
