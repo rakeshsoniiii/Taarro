@@ -5,8 +5,7 @@ import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { Camera, Edit3, X, LogOut, Settings, MapPin, GraduationCap, Briefcase, Heart, Sparkles, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from '../../config';
 
 const InfoRow = ({ icon: Icon, label, value }) => {
   if (!value) return null;

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { SOCKET_URL } from '../config';
 
 const SocketContext = createContext(null);
 
@@ -20,7 +21,7 @@ export const SocketProvider = ({ children }) => {
     }
 
     const token = localStorage.getItem('buddyups_token');
-    const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
+    const socket = io(SOCKET_URL, {
       auth: { token },
       transports: ['websocket'],
     });

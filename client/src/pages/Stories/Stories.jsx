@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { Plus } from 'lucide-react';
+import { API_BASE } from '../../config';
 
 export default function Stories() {
   const [stories, setStories] = useState([]);
@@ -84,7 +85,7 @@ export default function Stories() {
               flexShrink: 0
             }}>
               <img 
-                src={`http://localhost:5000${story.mediaUrl}`} 
+                src={`${API_BASE}${story.mediaUrl}`} 
                 alt="story" 
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />

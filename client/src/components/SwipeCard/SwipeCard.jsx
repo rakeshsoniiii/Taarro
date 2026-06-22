@@ -1,8 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation } from 'framer-motion';
 import { MapPin, GraduationCap, Briefcase, Heart, X, Star } from 'lucide-react';
-
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from '../../config';
 
 export default function SwipeCard({ profile, onSwipe, style, isTop }) {
   const x = useMotionValue(0);

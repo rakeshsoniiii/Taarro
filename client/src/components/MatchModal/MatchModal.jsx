@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from '../../config';
 
 export default function MatchModal({ matchedUser, onClose, onMessage }) {
   if (!matchedUser) return null;

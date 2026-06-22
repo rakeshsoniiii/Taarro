@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 import { Camera, X, MapPin, ChevronRight, ChevronLeft } from 'lucide-react';
+import { API_BASE } from '../../config';
 
 const STEPS = ['Basic Info', 'Location', 'Photos', 'Matrimonial', 'Preferences'];
 
@@ -221,7 +222,7 @@ export default function SetupProfile() {
                   <div key={i} className="photo-slot" onClick={() => { if (!photos[i]) document.getElementById('photo-upload').click(); }}>
                     {photos[i] ? (
                       <>
-                        <img src={`http://localhost:5000${photos[i]}`} alt={`Photo ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={`${API_BASE}${photos[i]}`} alt={`Photo ${i+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         <button className="photo-remove" onClick={(e) => { e.stopPropagation(); handlePhotoDelete(i); }}>
                           <X size={12} />
                         </button>

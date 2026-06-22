@@ -5,8 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { MessageCircle, Heart, Calendar, Sparkles, Users } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
-
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from '../../config';
 
 export default function Matches() {
   const [matches, setMatches] = useState([]);

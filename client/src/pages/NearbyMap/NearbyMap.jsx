@@ -6,8 +6,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { MapPin } from 'lucide-react';
-
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from '../../config';
 
 // Fix leaflet default icons
 delete L.Icon.Default.prototype._getIconUrl;
